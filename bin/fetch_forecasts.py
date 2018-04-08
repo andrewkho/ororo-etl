@@ -17,5 +17,4 @@ def fetch_forecasts():
 
 
 if __name__ == '__main__':
-    print("hi")
     fetch_forecasts()
