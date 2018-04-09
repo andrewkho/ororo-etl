@@ -1,0 +1,6 @@
+[Unit]
+Description=Run the ororo-etl job
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run -it fetch-forecast
