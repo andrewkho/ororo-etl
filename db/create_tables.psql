@@ -1,0 +1,34 @@
+-- Describes the schema for ororo database
+
+CREATE SCHEMA yahoo;
+
+CREATE TABLE yahoo.weather(
+   ts TIMESTAMP          NOT NULL,
+   loc_id INTEGER        NOT NULL,
+   location VARCHAR(64)  NOT NULL,
+   condition_date TIMESTAMP,
+   temperature INTEGER,
+   condition_code INTEGER,
+   condition_text VARCHAR(64),
+   wind_chill INTEGER,
+   wind_direction INTEGER,
+   wind_speed INTEGER,
+   humidity INTEGER,
+   pressure INTEGER,
+   rising INTEGER,
+   visibility REAL,
+   PRIMARY KEY (ts, loc_id)
+);
+
+CREATE TABLE yahoo.forecast(
+   ts TIMESTAMP          NOT NULL,
+   loc_id INTEGER        NOT NULL,
+   location VARCHAR(64)  NOT NULL,
+   forecast_date DATE,
+   forecast_day CHAR(3),
+   condition_code INTEGER,
+   high INTEGER,
+   low INTEGER,
+   condition_text VARCHAR(64),
+   PRIMARY KEY (ts, loc_id, forecast_date)
+);
