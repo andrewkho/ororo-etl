@@ -102,3 +102,6 @@ ENV/
 
 # intellij/pycharm
 .idea
+
+# secrets
+secrets/

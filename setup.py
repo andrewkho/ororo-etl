@@ -15,6 +15,6 @@ setup(
         'Data Science, Weather',
     ],
     install_requires=[
-        'requests', 'requests_oauthlib', 'urllib3'
+        'requests', 'requests_oauthlib', 'urllib3', 'sqlalchemy', 'pandas'
     ]
 )
