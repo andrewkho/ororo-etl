@@ -3,6 +3,9 @@ import logging
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+import dateutil.parser
+import pandas as pd
+
 from extract.extractor import Extractor
 
 logger = logging.getLogger(__name__)
@@ -47,6 +50,39 @@ class YahooExtractor(Extractor):
             forecast = json.loads(data.decode(encoding))
             logger.debug("result: %s" % forecast['query']['results'])
 
-            forecasts[k] = forecast['query']['results']
+            forecasts[k] = forecast['query']
+            forecasts[k]['woe_id'] = v['w']
 
         return forecasts
+
+    def get_timestamp(self, forecast):
+        return
+
+    def get_weather_frame(self, forecasts: dict) -> pd.DataFrame:
+        all_weather = None
+        for city, forecast in forecasts.items():
+            ts = forecast['created']
+            results = forecast['results']['channel']
+            loc_id = forecast['woe_id']
+            weather_data = {
+                'ts': dateutil.parser.parse(ts),
+                'loc_id': int(loc_id),
+                'location': str(city),
+                'condition_date': dateutil.parser.parse(results['item']['condition']['date']),
+                'temperature': int(results['item']['condition']['temp']),
+                'condition_code': int(results['item']['condition']['code']),
+                'condition_text': str(results['item']['condition']['text']),
+                'wind_chill': int(results['wind']['chill']),
+                'wind_direction': int(results['wind']['direction']),
+                'wind_speed': int(results['wind']['speed']),
+                'humidity': int(results['atmosphere']['humidity']),
+                'pressure': int(float(results['atmosphere']['pressure'])),
+                'rising': int(results['atmosphere']['rising']),
+                'visibility': float(results['atmosphere']['visibility']),
+            }
+            if all_weather is None:
+                all_weather = pd.DataFrame(data=weather_data, index=[0])
+            else:
+                all_weather = all_weather.append(weather_data, ignore_index=True)
+
+        return all_weather
