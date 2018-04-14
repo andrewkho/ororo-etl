@@ -15,15 +15,20 @@ logger = logging.getLogger(__name__)
 def fetch_forecasts():
     logger.info('Fetching forecasts')
     extractor = YahooExtractor()
-    forecast = extractor.get_forecast()
-    logger.info("forecast: " + str(forecast))
+    raw_data = extractor.get_forecast()
+    logger.info("forecast: " + str(raw_data))
 
     # Store forecast in postgres
     # write weather table
-    weather_frame = extractor.get_weather_frame(forecast)
-
-    # write forecast table
+    logger.info("Writing weather")
+    weather_frame = extractor.get_weather_frame(raw_data)
     postgres_connector.store_df(weather_frame, 'yahoo', 'weather')
+
+    logger.info("Writing forecast")
+    forecast_frame = extractor.get_forecast_frame(raw_data)
+    postgres_connector.store_df(forecast_frame, 'yahoo', 'forecast')
+
+    logger.info("done!")
 
 
 if __name__ == '__main__':

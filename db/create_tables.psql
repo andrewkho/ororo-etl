@@ -24,11 +24,11 @@ CREATE TABLE yahoo.forecast(
    ts TIMESTAMP          NOT NULL,
    loc_id INTEGER        NOT NULL,
    location VARCHAR(64)  NOT NULL,
-   forecast_date DATE,
-   forecast_day CHAR(3),
-   condition_code INTEGER,
+   date DATE,
+   day CHAR(3),
+   code INTEGER,
    high INTEGER,
    low INTEGER,
-   condition_text VARCHAR(64),
+   text VARCHAR(64),
    PRIMARY KEY (ts, loc_id, forecast_date)
 );

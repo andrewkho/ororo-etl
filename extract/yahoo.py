@@ -5,6 +5,7 @@ from urllib.request import urlopen
 
 import dateutil.parser
 import pandas as pd
+from pandas.io.json import json_normalize
 
 from extract.extractor import Extractor
 
@@ -55,8 +56,7 @@ class YahooExtractor(Extractor):
 
         return forecasts
 
-    def get_weather_row(self, city, forecast):
-        # type: (str, dict) -> pd.DataFrame
+    def get_weather_row(self, city: str, forecast: dict) -> pd.DataFrame:
         ts = forecast['created']
         results = forecast['results']['channel']
         loc_id = forecast['woe_id']
@@ -87,3 +87,25 @@ class YahooExtractor(Extractor):
                 all_weather = all_weather.append(weather_data, ignore_index=True)
 
         return all_weather
+
+    def get_forecast_rows(self, city: str, forecast: dict) -> pd.DataFrame:
+        ts = forecast['created']
+        results = forecast['results']['channel']
+        loc_id = forecast['woe_id']
+        forecast_data = json_normalize(results['item']['forecast'])
+        forecast_data['ts'] = dateutil.parser.parse(ts, ignoretz=True)
+        forecast_data['loc_id'] = int(loc_id)
+        forecast_data['location']: str(city)
+
+        return forecast_data
+
+    def get_forecast_frame(self, forecasts: dict) -> pd.DataFrame:
+        all_forecast = None
+        for city, forecast in forecasts.items():
+            weather_data = self.get_forecast_rows(city, forecast)
+            if all_forecast is None:
+                all_forecast = weather_data
+            else:
+                all_forecast = all_forecast.append(weather_data, ignore_index=True)
+
+        return all_forecast
