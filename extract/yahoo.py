@@ -65,7 +65,8 @@ class YahooExtractor(Extractor):
             'ts': dateutil.parser.parse(ts),
             'loc_id': int(loc_id),
             'location': str(city),
-            'condition_date': dateutil.parser.parse(results['item']['condition']['date'], ignoretz=True),
+            'condition_date': dateutil.parser.parse(results['item']['condition']['date'], ignoretz=True).astimezone(
+                pytz.utc),
             'temperature': int(results['item']['condition']['temp']),
             'condition_code': int(results['item']['condition']['code']),
             'condition_text': str(results['item']['condition']['text']),
