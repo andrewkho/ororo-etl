@@ -3,6 +3,7 @@ import sys
 
 import pandas as pd
 
+from db import postgres_connector
 from extract.yahoo import YahooExtractor
 
 log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -22,6 +23,7 @@ def fetch_forecasts():
     weather_frame = extractor.get_weather_frame(forecast)
 
     # write forecast table
+    postgres_connector.store_df(weather_frame, 'yahoo', 'weather')
 
 
 if __name__ == '__main__':

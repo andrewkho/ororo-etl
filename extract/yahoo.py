@@ -5,6 +5,7 @@ from urllib.request import urlopen
 
 import dateutil.parser
 import pandas as pd
+import pytz
 
 from extract.extractor import Extractor
 
@@ -55,34 +56,38 @@ class YahooExtractor(Extractor):
 
         return forecasts
 
-    def get_timestamp(self, forecast):
-        return
+    def get_weather_row(self, city, forecast):
+        # type: (str, dict) -> pd.DataFrame
+        ts = forecast['created']
+        results = forecast['results']['channel']
+        loc_id = forecast['woe_id']
+        return pd.DataFrame({
+            'ts': dateutil.parser.parse(ts),
+            'loc_id': int(loc_id),
+            'location': str(city),
+            'condition_date': dateutil.parser.parse(results['item']['condition']['date'], ignoretz=True),
+            'temperature': int(results['item']['condition']['temp']),
+            'condition_code': int(results['item']['condition']['code']),
+            'condition_text': str(results['item']['condition']['text']),
+            'wind_chill': int(results['wind']['chill']),
+            'wind_direction': int(results['wind']['direction']),
+            'wind_speed': int(results['wind']['speed']),
+            'humidity': int(results['atmosphere']['humidity']),
+            'pressure': int(float(results['atmosphere']['pressure'])),
+            'rising': int(results['atmosphere']['rising']),
+            'visibility': float(results['atmosphere']['visibility']),
+        }, index=[0])
 
     def get_weather_frame(self, forecasts: dict) -> pd.DataFrame:
         all_weather = None
         for city, forecast in forecasts.items():
-            ts = forecast['created']
-            results = forecast['results']['channel']
-            loc_id = forecast['woe_id']
-            weather_data = {
-                'ts': dateutil.parser.parse(ts),
-                'loc_id': int(loc_id),
-                'location': str(city),
-                'condition_date': dateutil.parser.parse(results['item']['condition']['date']),
-                'temperature': int(results['item']['condition']['temp']),
-                'condition_code': int(results['item']['condition']['code']),
-                'condition_text': str(results['item']['condition']['text']),
-                'wind_chill': int(results['wind']['chill']),
-                'wind_direction': int(results['wind']['direction']),
-                'wind_speed': int(results['wind']['speed']),
-                'humidity': int(results['atmosphere']['humidity']),
-                'pressure': int(float(results['atmosphere']['pressure'])),
-                'rising': int(results['atmosphere']['rising']),
-                'visibility': float(results['atmosphere']['visibility']),
-            }
+            weather_data = self.get_weather_row(city, forecast)
             if all_weather is None:
-                all_weather = pd.DataFrame(data=weather_data, index=[0])
+                all_weather = weather_data
             else:
                 all_weather = all_weather.append(weather_data, ignore_index=True)
+
+        all_weather['ts'] = pd.to_datetime(all_weather['ts'])
+        all_weather['condition_date'] = pd.to_datetime(all_weather['condition_date'])
 
         return all_weather
