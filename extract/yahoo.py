@@ -5,7 +5,6 @@ from urllib.request import urlopen
 
 import dateutil.parser
 import pandas as pd
-import pytz
 
 from extract.extractor import Extractor
 
@@ -62,11 +61,10 @@ class YahooExtractor(Extractor):
         results = forecast['results']['channel']
         loc_id = forecast['woe_id']
         return pd.DataFrame({
-            'ts': dateutil.parser.parse(ts),
+            'ts': dateutil.parser.parse(ts, ignoretz=True),  # Already UTC
             'loc_id': int(loc_id),
             'location': str(city),
-            'condition_date': dateutil.parser.parse(results['item']['condition']['date'], ignoretz=True).astimezone(
-                pytz.utc),
+            'condition_date': dateutil.parser.parse(results['item']['condition']['date'], ignoretz=True),
             'temperature': int(results['item']['condition']['temp']),
             'condition_code': int(results['item']['condition']['code']),
             'condition_text': str(results['item']['condition']['text']),
@@ -88,7 +86,7 @@ class YahooExtractor(Extractor):
             else:
                 all_weather = all_weather.append(weather_data, ignore_index=True)
 
-        all_weather['ts'] = pd.to_datetime(all_weather['ts'])
-        all_weather['condition_date'] = pd.to_datetime(all_weather['condition_date'])
+        #all_weather['ts'] = pd.to_datetime(all_weather['ts'])
+        #all_weather['condition_date'] = pd.to_datetime(all_weather['condition_date'])
 
         return all_weather

@@ -13,4 +13,8 @@ engine = create_engine('postgresql://%s:%s@%s/%s' % (DB_USER, DB_SECRET, DB_URL,
 
 def store_df(df, schema_name, table_name):
     # type: (pd.DataFrame, str, str) -> None
-    df.to_sql(schema_name + "." + table_name, engine, if_exists='append')
+    df.to_sql(name=table_name,
+              con=engine,
+              schema=schema_name,
+              if_exists='append',
+              index=False)
