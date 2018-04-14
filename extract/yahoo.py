@@ -95,7 +95,7 @@ class YahooExtractor(Extractor):
         forecast_data = json_normalize(results['item']['forecast'])
         forecast_data['ts'] = dateutil.parser.parse(ts, ignoretz=True)
         forecast_data['loc_id'] = int(loc_id)
-        forecast_data['location']: str(city)
+        forecast_data['location'] = str(city)
 
         return forecast_data
 

@@ -30,5 +30,5 @@ CREATE TABLE yahoo.forecast(
    high INTEGER,
    low INTEGER,
    text VARCHAR(64),
-   PRIMARY KEY (ts, loc_id, forecast_date)
+   PRIMARY KEY (ts, loc_id, date)
 );
