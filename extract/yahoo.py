@@ -86,7 +86,4 @@ class YahooExtractor(Extractor):
             else:
                 all_weather = all_weather.append(weather_data, ignore_index=True)
 
-        #all_weather['ts'] = pd.to_datetime(all_weather['ts'])
-        #all_weather['condition_date'] = pd.to_datetime(all_weather['condition_date'])
-
         return all_weather
