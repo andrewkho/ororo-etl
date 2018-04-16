@@ -3,5 +3,6 @@ Description=Run the ororo-etl job
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/docker run -e "POSTGRES_PASSWORD=$(cat /secrets/postgres_password)" fetch-forecast
+ExecStart=/bin/bash -c "/usr/bin/docker run -e \"POSTGRES_PASSWORD=$$(cat /secrets/postgres_password)\" fetch-forecast"
+
 
